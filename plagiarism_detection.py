@@ -55,7 +55,7 @@ def plagiarism_detection(file_path):
     similarities = get_similarities(file, comparing_files)
 
     with open('results.json', 'w') as results_file:
-        results_file.write(json.dump(similarities), indent=4, sort_keys=True)
+        json.dump(similarities, results_file, indent=4, sort_keys=True)
 
     return 0
 

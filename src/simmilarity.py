@@ -54,7 +54,7 @@ def db_similarities(df, comparing_df, similarities):
                     
     return similarities
 
-def url_similarities(df, urls, simmilarities):
+def url_similarities(df, urls, similarities):
     
 
     unprocessed_corpus = df['corpus']
@@ -62,7 +62,6 @@ def url_similarities(df, urls, simmilarities):
     
     comparing_df = read_urls(urls)
 
-    similarities = []
     corpus = [slice[1] for slice in processed_corpus]
     
     for _, row in comparing_df.iterrows():

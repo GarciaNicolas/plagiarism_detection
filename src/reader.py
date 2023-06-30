@@ -105,11 +105,15 @@ def read_urls(urls):
 
             #Drop blank lines
             text = '. '.join(chunk for chunk in chunks if chunk)
+
+            #Remove special characters
+            text = clean_special_characters(text)
+
             corpus = get_corpus(text)
             processed_corpus = process_indexed_corpus(corpus)
             
-
             df = pd.concat([df, pd.DataFrame({'url':url,'corpus':[corpus], 'processed_corpus': [processed_corpus]}, index=[0])], ignore_index=True)
+            
     return df    
 
 #---Type of file---------------------------------------------------------------------------------------------------------------
