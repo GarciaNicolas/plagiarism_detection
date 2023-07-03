@@ -69,19 +69,22 @@ def get_author(string, headers):
 
             return author
     
-    #If there are not any author synonyms, look into haeders the first contiguos persons
+    #If there are not any author synonyms and headers is not empty, look into haeders the first contiguos persons
     if author == [] and not (type(headers) == float and pd.isna(headers)):
         
         for header in headers:
             doc = nlp(header)
+
             for i, token in enumerate(doc):
+                
+                #If there is any author synonym, look for the first contiguos persons before it
                 if token.text.lower() in author_synonyms:
                     doc = doc[i+1:]
                     doc_list = [token for token in doc if (doc.text.lower() not in stop_author) and not(doc.pos_ == 'PUNCT' or doc.pos_ == 'SPACE')]
                     index = first_contiguos_persons(doc_list)
                     author += [doc.text for doc in doc_list[index[0]:index[1]]]
-    elif author == []:
 
+    elif author == []:
         author = np.nan
     
     return author

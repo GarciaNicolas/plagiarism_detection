@@ -3,21 +3,16 @@ import json
 
 from src.reader import read_file, read_path, read_database
 from src.processor import processing_pipeline
-from src.simmilarity import get_similarities
+from src.similarity import get_similarities
 from src.topic import similar_topics
 from src.helper import merge_dataframes
-  
-__name__ = "__main__"
-__author__ = "Nicolás Francisco García <nicolas.f.garcia03@gmail.com>"
 
-# VER TEMA DE PATH RELATIVOS Y ABSOLUTOS
 
 database = True 
 threshold = 0.7 
 closeness = 3
 store = False
 comparing_path = ''
-
 
 
 def validate_threshold(value):
@@ -32,33 +27,44 @@ def validate_closeness(value):
 
 
 def plagiarism_detection(file_path):
-    
+    """
+    Receive a file path and return a json with the similarities.
+    """
 
+    #Read the file and store it in a dataframe
     file = read_file(file_path)
 
+    #If comparing_path is not empty, read the files from the path and store them in a dataframe
     if comparing_path:
         comparing_files = read_path(comparing_path)
+        comparing_files.apply(processing_pipeline)
+
+        #If database is True, read the database and merge it with the comparing files
         if database:
             comparing_files = merge_dataframes(comparing_files, read_database())
-    else:
+
+    #If comparing_path is empty and database is True, read the database and store it in a dataframe        
+    elif database:
         comparing_files = read_database()
-        
+    
+    else:
+        raise Exception('No files to compare')
+    
 
     file.apply(processing_pipeline)
-    comparing_files.apply(processing_pipeline)
 
-
+    #If store is True, update the database with comparing files
     if store:
         comparing_files.to_csv('./data.csv', index=False)
 
+    #Keep only the files with similar topics
     comparing_files = similar_topics(file, comparing_files)
+
+    #Get the similarities between the file and the comparing files
     similarities = get_similarities(file, comparing_files)
 
     with open('results.json', 'w') as results_file:
         json.dump(similarities, results_file, indent=4, sort_keys=True)
-
-    return 0
-
 
 
 if __name__ == "__main__":
@@ -80,4 +86,4 @@ if __name__ == "__main__":
     store = args.store
     comparing_path = args.comparing_path
 
-    plagiarism_detection(args.path)
+    plagiarism_detection(args.file_path)
